@@ -70,11 +70,10 @@ class Engine extends EBaseRun{
                 ///PROCESAMOS LA URL
                 $url = EHttp::getUrl();
                 self::$_controller = (isset($url[0] )&& $url[0]!=null)? $url[0] : self::$config['run']['defaultController'];
-                self::$_action = (isset($url[1]) && $url[1]!=null)? $url[1] : self::$config['run']['defaultAction'];
-
+                              
                 ///OBTENEMOS LAS VARIABLES
                 
-                $variables = EHttp::getVariables($url);
+                $variables = EHttp::getVariables($url, self::$config['run']['enableRest']);
 //                echo md5(serialize($variables));
 //                print_r($variables);
 //                }
@@ -95,15 +94,19 @@ class Engine extends EBaseRun{
                     
                     $controller =  self::$_controller . 'Controller' ;
                     
-                    error_log("REQUEST METHOD: ".$_SERVER['REQUEST_METHOD']. "\n", 3, "/tmp/error.log");
-                    error_log("REQUEST URI: ".$_SERVER['REQUEST_URI']. "\n", 3, "/tmp/error.log");
-                    error_log("URL: ".  var_export($url, true). "\n", 3, "/tmp/error.log");
+                    if(isset($url[1]) && $url[1]!=null){
+                        self::$_action = $url[1];
+                    }elseif(self::$config['run']['enableRest'] && method_exists($controller, '__'.EHttp::getMethod().'__')){
+                        self::$_action = '__'.EHttp::getMethod().'__';
+                        $controller::$showTemplate = false;
+                    }else{
+                        self::$_action = self::$config['run']['defaultAction'];
+                    }
+                    
+                    
                     //Execute action
-                    if(method_exists($controller, self::$_action) ||
-                            (self::$config['run']['enableRest'] && method_exists($controller, '__'.EHttp::getMethod().'__') )){
+                    if( method_exists($controller, self::$_action) ){
                         
-                        
-                        error_log("METHOD CLASS: ".'__'.EHttp::getMethod().'__'. "\n", 3, "/tmp/error.log");
                         //Cargamos las clases para las vistas
                         
                         //TODO: no se si sea correcto... pero aqui inicio las sesiones.. esto mantendria vivas las sessiones
@@ -184,16 +187,19 @@ class Engine extends EBaseRun{
                             ECache::getHash(EHttp::getUrl(true));
                             
                             if(ECache::isStatic()){//No tiene cache?
-                                if(!ECache::haveCache())
-                                    $actionReturn = call_user_func_array(array($controller, $action), $variables);
-                            }else
-                                $actionReturn = call_user_func_array(array($controller, $action), $variables);
-                            
-                        }else 
-                            $actionReturn = call_user_func_array(array($controller, $action), $variables);
+                                if(!ECache::haveCache()){
+                                    $actionReturn = forward_static_call_array(array($controller, $action), $variables);
+                                }
+                            }else{
+                                $actionReturn = forward_static_call_array(array($controller, $action), $variables);        
+                            }
+                        }else {
+                            $actionReturn = forward_static_call_array(array($controller, $action), $variables);
+                        }
                         
+     
                         //Asignamos variables a la vista (solo si es un array)
-                        if(is_array($actionReturn)) EView::appendVars ($actionReturn);
+                        if(is_array($actionReturn)){ EView::appendVars ($actionReturn);}
                         //Obtenemos el contenido de la salida
                         Engine::$stdout = ob_get_contents();
                         ob_end_clean();
@@ -217,7 +223,7 @@ class Engine extends EBaseRun{
                         foreach($alibs as $lib){
                             include_once $lib;
                         }
-                        if(self::$config['run']['enableCache']){
+                        if(self::$config['run']['enableCache'] && !self::$config['run']['enableRest']){
                             
                             if(ECache::isStatic()){
                                 if(!ECache::haveCache()){
@@ -247,9 +253,13 @@ class Engine extends EBaseRun{
                             
                             
                         }else{
-                        
                             if($controller::$showTemplate){
                                 EView::getTemplate();
+                            }elseif(self::$config['run']['enableRest']){
+                                if(in_array(self::$_action, array('__GET__', '__POST__', '__PUT__', '__DELETE__'))){
+                                    header('Content-Type: application/json');
+                                    echo json_encode($actionReturn);
+                                }
                             }else{
                                 EView::getView();
                             }

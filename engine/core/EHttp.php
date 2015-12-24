@@ -40,22 +40,32 @@ class EHttp extends EBaseRun{
     }
     
     
-    public static function getVariables($url){
+    public static function getVariables($url, $restUrl = false){
         //Obtenemos las variables amigables
             // controller/action/var1/val/var2/val/var3/val
         $vars = array();
         $tv = count($url);
+        $start = $restUrl? 1:2;
         if($tv>2){
 //            for($i = 2; $i< $tv;$i+=2){
-            for($i = 2; $i< $tv;$i++){ //se omite el uso de nombres de variables cuando se pasan por url. El
+            for($i = $start; $i< $tv;$i++){ //se omite el uso de nombres de variables cuando se pasan por url. El
 //                $vars[$url[$i]] = $url[$i+1];
                 $vars[] = $url[$i];
             }
         }
         
         //Obtenemos las variables post o get
-        if(count($_GET)>2 || count($_POST)>0)
+        if(count($_GET)>2 || count($_POST)>0){
             $vars  = array_merge($vars, $_POST); //array_merge($vars, $_GET)
+        }
+        
+        if($restUrl){
+            $method = self::getMethod();
+            if($method == 'POST' || $method == 'PUT'){
+                $vars[] = file_get_contents('php://input');
+            }
+        }
+        
         return $vars;
     }
 
