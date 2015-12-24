@@ -18,6 +18,10 @@ class EView extends EBaseRun{
         $ctemplate = is_null(self::$template)? self::arrayToPath(array(APPDIR, 'sources', 'views', 'defaultTemplate.php') )
         : self::arrayToPath(array(APPDIR, 'sources', 'views', self::$template, 'template.php'));
         
+        if(count(self::$variables)>0){
+            $vars = self::$variables;
+            extract($vars);
+        }
         
         if(file_exists($ctemplate)){
             include($ctemplate);
