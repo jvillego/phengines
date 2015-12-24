@@ -7,6 +7,11 @@
 
 class EHttp extends EBaseRun{
     
+    public static function getMethod() {
+//        return filter_input('INPUT_SERVER', 'REQUEST_METHOD'); //TODO: revisar esta forma de capturar la info
+        return $_SERVER['REQUEST_METHOD'];
+    }
+    
     /**
      * Devuelve el valor GET o el array GET completo de acuerdo al parametro
      * @param string var nombre de la variable GET

@@ -95,8 +95,15 @@ class Engine extends EBaseRun{
                     
                     $controller =  self::$_controller . 'Controller' ;
                     
+                    error_log("REQUEST METHOD: ".$_SERVER['REQUEST_METHOD']. "\n", 3, "/tmp/error.log");
+                    error_log("REQUEST URI: ".$_SERVER['REQUEST_URI']. "\n", 3, "/tmp/error.log");
+                    error_log("URL: ".  var_export($url, true). "\n", 3, "/tmp/error.log");
                     //Execute action
-                    if(method_exists($controller, self::$_action)){
+                    if(method_exists($controller, self::$_action) ||
+                            (self::$config['run']['enableRest'] && method_exists($controller, '__'.EHttp::getMethod().'__') )){
+                        
+                        
+                        error_log("METHOD CLASS: ".'__'.EHttp::getMethod().'__'. "\n", 3, "/tmp/error.log");
                         //Cargamos las clases para las vistas
                         
                         //TODO: no se si sea correcto... pero aqui inicio las sesiones.. esto mantendria vivas las sessiones
