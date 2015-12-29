@@ -45,10 +45,10 @@ class EHttp extends EBaseRun{
             // controller/action/var1/val/var2/val/var3/val
         $vars = array();
         $tv = count($url);
-        $start = $restUrl? 1:2;
+//        $start = $restUrl? 1:2;
         if($tv>2){
 //            for($i = 2; $i< $tv;$i+=2){
-            for($i = $start; $i< $tv;$i++){ //se omite el uso de nombres de variables cuando se pasan por url. El
+            for($i = 2; $i< $tv;$i++){ //se omite el uso de nombres de variables cuando se pasan por url. El
 //                $vars[$url[$i]] = $url[$i+1];
                 $vars[] = $url[$i];
             }
@@ -63,6 +63,10 @@ class EHttp extends EBaseRun{
             $method = self::getMethod();
             if($method == 'POST' || $method == 'PUT'){
                 $vars[] = file_get_contents('php://input');
+            }else{
+                for($i = 1; $i< $tv;$i++){
+                    $vars[] = $url[$i];
+                }
             }
         }
         

@@ -94,7 +94,7 @@ class Engine extends EBaseRun{
                     
                     $controller =  self::$_controller . 'Controller' ;
                     
-                    if(isset($url[1]) && $url[1]!=null){
+                    if(isset($url[1]) && $url[1]!=null && method_exists($controller, $url[1]) ){
                         self::$_action = $url[1];
                     }elseif(self::$config['run']['enableRest'] && method_exists($controller, '__'.EHttp::getMethod().'__')){
                         self::$_action = '__'.EHttp::getMethod().'__';
