@@ -54,6 +54,24 @@ class hlp extends EHtml{
         }
         
     }
+    /**
+     * Carga una script del directorio /app/js/scriptname/ leyendo el archivo load.php
+     * @param type $filename nombre del directorio de la script en /app/js/
+     */
+    public static function loadCss($filename, $part=null){
+        echo "\n";
+        $scriptpath = APPDIR."/css/$filename/load.php";
+        if( file_exists($scriptpath) ){
+            include $scriptpath;
+            if(isset($load)){
+                foreach ($load as $file){
+                    $properties = array('href'=>APPURL.'/css/'.$filename.'/'.$file, 'rel'=>'stylesheet', 'type'=>'text/css');
+                    echo self::tag('link', $properties, '', true), "\n";
+                }
+            }
+        }
+        
+    }
     
     /**
      * De acuerdo al controlador y la vista actual carga un archivo js  

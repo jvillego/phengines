@@ -196,8 +196,8 @@ class Engine extends EBaseRun{
                         }else {
                             $actionReturn = forward_static_call_array(array($controller, $action), $variables);
                         }
+
                         
-     
                         //Asignamos variables a la vista (solo si es un array)
                         if(is_array($actionReturn)){ EView::appendVars ($actionReturn);}
                         //Obtenemos el contenido de la salida
@@ -259,6 +259,8 @@ class Engine extends EBaseRun{
                                 if(in_array(self::$_action, array('__GET__', '__POST__', '__PUT__', '__DELETE__'))){
                                     header('Content-Type: application/json');
                                     echo json_encode($actionReturn);
+                                }else{
+                                    EView::getView();
                                 }
                             }else{
                                 EView::getView();
