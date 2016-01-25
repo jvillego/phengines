@@ -64,6 +64,7 @@ class EHttp extends EBaseRun{
             if($method == 'POST' || $method == 'PUT'){
                 $vars[] = file_get_contents('php://input');
             }else{
+                $vars = array();
                 for($i = 1; $i< $tv;$i++){
                     $vars[] = $url[$i];
                 }
