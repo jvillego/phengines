@@ -71,7 +71,9 @@ class EActiveRecordBase extends ESQLBuilder{
 
             $this->select();
         }else{
-            $lastModel = end($this->joinStack);
+//            $lastModel = end($this->joinStack);
+            //Pregunta si se le indico en el 3er parametro la tabla con la que debe hacer join, si no toma la ultima del stak
+            $lastModel = isset($arguments[2])&&!empty($arguments[2])? $arguments[2]: end($this->joinStack);
             EModel::load($lastModel);
             
             $relatedModels = array();
