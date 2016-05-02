@@ -212,6 +212,8 @@ class EActiveRecordBase extends ESQLBuilder{
         return $this->modeldesc;
     }
     
-}
+    public function affectedRows() {
+        return $this->DB->getAffectedRows();
+    }
     
-?>
+}

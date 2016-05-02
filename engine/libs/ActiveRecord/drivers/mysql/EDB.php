@@ -45,7 +45,7 @@ class EDB extends EDBDriver{
     * @since: 2010-09-13 21:25
     */
     private function  connect() {
-        if(!$this->link = @mysql_connect($this->server, $this->username,  $this->password)){
+        if(!$this->link = mysqli_connect($this->server, $this->username,  $this->password,  $this->database)){
             $this->MyError('No se pudo realizar la conexi&oacute;n con la base de datos.');
             exit();
         }
@@ -59,7 +59,7 @@ class EDB extends EDBDriver{
     */
    public function  selectdb($database = null) {
         if(!is_null($database)) $this->database = $database;
-        if(!mysql_select_db( $this->database, $this->link)){
+        if(!mysqli_select_db( $this->link, $this->database )){
             $this->MyError('No se pudo seleccionar la base de datos.');
             exit();
         }
@@ -83,7 +83,7 @@ class EDB extends EDBDriver{
 //            $aModel[] = $meta;
 //        }
         
-        while($rw = mysql_fetch_array($rs, MYSQL_ASSOC)){
+        while($rw = mysqli_fetch_array($rs, MYSQLI_ASSOC)){
             $aModel[$rw['Field']] = $rw;
         }
         return $aModel;
@@ -119,7 +119,7 @@ class EDB extends EDBDriver{
     public function query($sql, $logsql = false) {
         if($logsql) echo $sql;
         $this->selectdb();
-        $rs = mysql_query($sql, $this->link) or die($this->MyError('Error In Query '.$sql));
+        $rs = mysqli_query($this->link, $sql) or die($this->MyError('Error In Query '.$sql));
         return $rs;
     }
 
@@ -133,7 +133,7 @@ class EDB extends EDBDriver{
     public function execQuery($sql, $logsql = false) {
         if($logsql) echo $sql;
         $this->selectdb();
-        $rs = mysql_query($sql, $this->link) or die($this->MyError('Error In Query '.$sql));
+        $rs = mysqli_query($this->link, $sql ) or die($this->MyError('Error In Query '.$sql));
     }
     /**
      *
@@ -148,7 +148,7 @@ class EDB extends EDBDriver{
      * @return array
      */
     public function  fetchArray($result) {
-        return mysql_fetch_array($result);
+        return mysqli_fetch_array($result);
     }
 
     /**
@@ -160,7 +160,7 @@ class EDB extends EDBDriver{
     * @return array
     */
     public function  fetchRow($result) {
-        return mysql_fetch_row($result);
+        return mysqli_fetch_row($result);
     }
 
 
@@ -228,18 +228,22 @@ class EDB extends EDBDriver{
      */
 
     private function MyError($msg=NULL) {
-        echo "<u>MySQL Driver Error</u>:  $msg. <u>The message is</u>: ".  mysql_error($this->link);
+        echo "<u>MySQL Driver Error</u>:  $msg. <u>The message is</u>: ".  mysqli_error($this->link);
     }
 
     public function getLastInsertId(){
-        return mysql_insert_id($this->link);
+        return mysqli_insert_id($this->link);
+    }
+    
+    public function getAffectedRows() {
+        return mysqli_affected_rows($this->link);
     }
 
         /**
      * Destructor de la clase
      */
     public function  __destruct() {
-        @mysql_close($this->link);
+        @mysqli_close($this->link);
     }
 }
 ?>
