@@ -48,6 +48,8 @@ class EDB extends EDBDriver{
         if(!$this->link = mysqli_connect($this->server, $this->username,  $this->password,  $this->database)){
             $this->MyError('No se pudo realizar la conexi&oacute;n con la base de datos.');
             exit();
+        }else{
+            $this->execQuery('SET sql_mode=""');
         }
     }
 
