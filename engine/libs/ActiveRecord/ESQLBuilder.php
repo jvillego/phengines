@@ -372,6 +372,7 @@ class ESQLBuilder{
             $this->where = '';
             $this->join = null;
             $this->sel = null;
+            $this->order = '';
             $this->limit = '';
         }else $this->rawQuery = false;
         return $this->sql;
