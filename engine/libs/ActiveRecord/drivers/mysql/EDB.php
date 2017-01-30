@@ -32,7 +32,7 @@ class EDB extends EDBDriver{
      * Constructor de la clase
      */
     public function __construct($config=array()) {
-        $this->setConfig(isset($config['database']['database'])?$config:Engine::getConfig());
+        $this->setConfig( isset($config['database']['database'])?   $config : Engine::getConfig() );
         $this->connect();
         $this->selectdb();
     }

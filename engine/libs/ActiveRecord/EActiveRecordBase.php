@@ -20,9 +20,17 @@ class EActiveRecordBase extends ESQLBuilder{
     
     public $methods = array();
     public $relatedModels = array();
+    public $__database_connection = null;
     
     public function __construct() {
-        $this->DB = new EDB();
+        $conn = array();
+
+        if(!is_null($this->__database_connection)){
+            $conf = Engine::getConfig();
+            $conn['database'] = $conf[$this->__database_connection];
+        }
+        
+        $this->DB = new EDB($conn);
         $this->DB->model = get_called_class();
         $this->model = $this->DB->model;
 
