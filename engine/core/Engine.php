@@ -73,7 +73,8 @@ class Engine extends EBaseRun{
                               
                 ///OBTENEMOS LAS VARIABLES
                 
-                $variables = EHttp::getVariables($url, self::$config['run']['enableRest']);
+                //$variables = EHttp::getVariables($url, self::$config['run']['enableRest']);
+                $variables = array();
 //                echo md5(serialize($variables));
 //                print_r($variables);
 //                }
@@ -95,8 +96,10 @@ class Engine extends EBaseRun{
                     $controller =  self::$_controller . 'Controller' ;
                     
                     if(isset($url[1]) && $url[1]!=null && method_exists($controller, $url[1]) ){
+                        $variables = EHttp::getVariables($url);
                         self::$_action = $url[1];
                     }elseif(self::$config['run']['enableRest'] && method_exists($controller, '__'.EHttp::getMethod().'__')){
+                        $variables = EHttp::getVariables($url, self::$config['run']['enableRest']);
                         self::$_action = '__'.EHttp::getMethod().'__';
                         $controller::$showTemplate = false;
                     }else{
