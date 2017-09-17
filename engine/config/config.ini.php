@@ -6,7 +6,6 @@
 defaultApp = helloworld
 
 [preload]
-libs = Session/Session
+libs = Session/Session,tcpdf/tcpdf_include,firebase/php-jwt/include
 
 ;*/
-;?>
