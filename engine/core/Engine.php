@@ -260,8 +260,12 @@ class Engine extends EBaseRun{
                                 EView::getTemplate();
                             }elseif(self::$config['run']['enableRest']){
                                 if(in_array(self::$_action, array('__GET__', '__POST__', '__PUT__', '__DELETE__'))){
-                                    header('Content-Type: application/json');
-                                    echo json_encode($actionReturn);
+                                    if ($controller::$rest_enable_auto_response){
+                                        header('Content-Type: application/json');
+                                        echo json_encode($actionReturn);
+                                    }else{
+                                        EView::getView();
+                                    }
                                 }else{
                                     EView::getView();
                                 }

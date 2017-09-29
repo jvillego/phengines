@@ -24,6 +24,12 @@ class EController extends EHttp{
     
     
     /**
+     * Permite indicar si los metodos REST devuelven una respuesta automaticamente
+     * @var Boolean 
+     */
+    public static $rest_enable_auto_response = true;
+    
+    /**
      * Agrega una variable para la vista
      */
     public static function setVar($strVarname, $value){
