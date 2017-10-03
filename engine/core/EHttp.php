@@ -29,44 +29,28 @@ class EHttp extends EBaseRun{
     }
     
     /**
-     * Devuelve la url amigable
+     * Devuelve el request uri de la variable $_SERVER
      * @param boolean $rawString true Para devolver la url en forma de string, false para devolver en forma de array
      * @return mixed 
      */
-    public static function getUrl($rawString = false){
-        $keys = key($_GET);
-        $sUrl = empty($keys)? key($_POST): key($_GET);
-        return $rawString? $keys : explode('/',$sUrl);
+    public static function getUrl(){
+        return $_SERVER['REQUEST_URI'];
     }
     
     
-    public static function getVariables($url, $restUrl = false){
-        //Obtenemos las variables amigables
-            // controller/action/var1/val/var2/val/var3/val
-        $vars = array();
-        $tv = count($url);
-//        $start = $restUrl? 1:2;
-        if($tv>2){
-//            for($i = 2; $i< $tv;$i+=2){
-            for($i = 2; $i< $tv;$i++){ //se omite el uso de nombres de variables cuando se pasan por url. El
-//                $vars[$url[$i]] = $url[$i+1];
-                $vars[] = $url[$i];
-            }
-        }
+    public static function getVariables(){
+
+        $vars = $_REQUEST;
         
-        //Obtenemos las variables post o get
-        if(count($_GET)>2 || count($_POST)>0){
-            $vars  = array_merge($vars, $_POST); //array_merge($vars, $_GET)
-        }
-        
-        if($restUrl){
-            $method = self::getMethod();
-            if($method == 'POST' || $method == 'PUT'){
-                $vars[] = file_get_contents('php://input');
-            }else{
-                $vars = array();
-                for($i = 1; $i< $tv;$i++){
-                    $vars[] = $url[$i];
+        //if post or put has body content
+        if(in_array(self::getMethod(), array('POST', 'PUT')) ){
+            $body_content = file_get_contents('php://input');
+            if(!empty($body_content)){
+                $auxvars = json_decode($body_content, true);
+                if(!is_null($auxvars)){
+                    $vars = array_merge($vars, $auxvars);
+                }else{
+                    $vars['data'] = $body_content;
                 }
             }
         }

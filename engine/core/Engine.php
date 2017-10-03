@@ -66,22 +66,13 @@ class Engine extends EBaseRun{
             
             if(isset(self::$config['run'])){
                 require self::strToPath(COREDIR . '/EHttp.php');
-//                if(self::$config['run']['friendlyUrls']){
-                ///PROCESAMOS LA URL
-                $url = EHttp::getUrl();
-                self::$_controller = (isset($url[0] )&& $url[0]!=null)? $url[0] : self::$config['run']['defaultController'];
+
+                $variables = EHttp::getVariables();
+                
+                self::$_controller = (isset($variables['__ctrl'] ) && $variables['__ctrl']!=null)? $variables['__ctrl'] : self::$config['run']['defaultController'];
                               
                 ///OBTENEMOS LAS VARIABLES
                 
-                //$variables = EHttp::getVariables($url, self::$config['run']['enableRest']);
-                $variables = array();
-//                echo md5(serialize($variables));
-//                print_r($variables);
-//                }
-//                else{
-//                    self::$_controller = (self::request('controller')!=null)? self::request('controller'): self::$config['run']['defaultController'];
-//                    self::$_action = (self::request('action')!=null)? self::request('action'): self::$config['run']['defaultAction'];
-//                }
                 
                 $ControllerPath = self::strToPath( APPDIR . '/sources/controllers/'. self::$_controller.'Controller.php');
                 
@@ -89,17 +80,17 @@ class Engine extends EBaseRun{
                     
                     //Cargamos las clases necesarias
                     require self::strToPath(COREDIR . '/EController.php');
+                    EController::$_request_vars = $variables;
+                    
                     require self::strToPath(APPDIR . '/sources/base/EngineApplication.php');
                     //Cargamos el controlador
                     require $ControllerPath;
                     
                     $controller =  self::$_controller . 'Controller' ;
                     
-                    if(isset($url[1]) && $url[1]!=null && method_exists($controller, $url[1]) ){
-                        $variables = EHttp::getVariables($url);
-                        self::$_action = $url[1];
+                    if(isset($variables['__act']) && $variables['__act']!=null && method_exists($controller, $variables['__act']) ){
+                        self::$_action = $variables['__act'];
                     }elseif(self::$config['run']['enableRest'] && method_exists($controller, '__'.EHttp::getMethod().'__')){
-                        $variables = EHttp::getVariables($url, self::$config['run']['enableRest']);
                         self::$_action = '__'.EHttp::getMethod().'__';
                         $controller::$showTemplate = false;
                     }else{
@@ -107,7 +98,13 @@ class Engine extends EBaseRun{
                     }
                     
                     
+                    unset($variables['__ctrl']);
+                    unset($variables['__act']);
+                    unset(EController::$_request_vars['__ctrl']);
+                    unset(EController::$_request_vars['__act']);
+                    
                     //Execute action
+                    //@todo use exceptions
                     if( method_exists($controller, self::$_action) ){
                         
                         //Cargamos las clases para las vistas
@@ -177,13 +174,20 @@ class Engine extends EBaseRun{
                         
                         //CALLBACKS
                         if(method_exists($controller, 'beforeAction')){
-                            $controller::beforeAction();
+                            try{
+                                
+                                $actionReturn = forward_static_call_array(array($controller, 'beforeAction'), $variables);
+                                
+                                
+                            }  catch (Exception $e){
+                                //add log library
+                            }
                         }
                         
                         //EXECUTE ACTION
                         $action = self::$_action;
                         require self::strToPath(COREDIR  . '/EView.php');
-//                        $controller::$action();
+
                         $actionReturn = array();
                         if(self::$config['run']['enableCache']){
                             require self::strToPath(ROOTDIR.'/engine/libs/ECache.php');
@@ -210,11 +214,7 @@ class Engine extends EBaseRun{
                         EView::$template = $controller::$template;
                         EView::$view = !is_null($controller::$view)? $controller::$view : $action;
                         
-//                        $var = "deuedd1b";
-//                        echo md5( var_export($variables) );
-//                        
-//                        echo (memory_get_usage()*8), ' ';
-                        
+
                         ///AQUI APLICAMOS EL CACHE
                         require self::strToPath(ROOTDIR.'/engine/libs/Helpers/EHtml.php');
                         require self::strToPath(ROOTDIR.'/engine/libs/Helpers/EHelpers.php');

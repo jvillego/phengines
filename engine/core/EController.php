@@ -29,6 +29,36 @@ class EController extends EHttp{
      */
     public static $rest_enable_auto_response = true;
     
+    
+    /**
+     * Almacena el array de variables de la peticion
+     * @var type 
+     */
+    public static $_request_vars = array();
+    
+    
+    /**
+     * Devuelve las variables de la peticion
+     * @param string $param_name
+     * @return mixed
+     */
+    public static function req_vars() {
+        return self::$_request_vars;
+    }
+    
+    /**
+     * Devuelve el valor de una variable de la peticion
+     * @param string $param_name
+     * @return mixed
+     */
+    public static function req_var($param_name) {
+        if(isset(self::$_request_vars[$param_name])){
+            return self::$_request_vars[$param_name];
+        }else{
+            return null;
+        }
+    }
+    
     /**
      * Agrega una variable para la vista
      */
@@ -55,4 +85,3 @@ class EController extends EHttp{
         ECache::staticCache();
     }
 }
-?>
