@@ -19,6 +19,18 @@ define('APPDIR', getcwd()) ;
 
 define('APPURL', dirname($_SERVER['SCRIPT_NAME']));
 
+include ROOTDIR .'/engine/libs/Console.php';
+
+if(class_exists('console')){
+    
+    console::configure(array(
+       'logfile'=>'/tmp/error.log',
+       'appname'=>'engines',
+       'loglevel'=>'trace'
+    ));
+    
+}
+
 class Engine extends EBaseRun{
     
     public static $_controller;
