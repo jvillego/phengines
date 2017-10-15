@@ -74,8 +74,10 @@ class Engine extends EBaseRun{
             
             self::$engine_config = parse_ini_file(self::strToPath(ROOTDIR.'/engine/config/config.ini.php'), true);
             self::$config = parse_ini_file($CPATH, true);
-
             
+            //log system configuration
+            console::configure(self::$config['application']);
+                        
             if(isset(self::$config['run'])){
                 require self::strToPath(COREDIR . '/EHttp.php');
 
