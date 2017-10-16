@@ -325,7 +325,10 @@ class Engine extends EBaseRun{
     /**
      * Devuelve el array de configuracion
      */
-    public static function getConfig(){
+    public static function getConfig($section=null){
+        if(!is_null($section)){
+            return (isset(self::$config[$section])? self::$config[$section]: null);
+        }
         return self::$config;
     }
     /**
