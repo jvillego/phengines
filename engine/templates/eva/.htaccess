@@ -1,0 +1,4 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^([A-Za-z]+)/([A-Za-z_]+)?/?$ index.php?__ctrl=$1&__act=$2 [QSA]
+</IfModule>
