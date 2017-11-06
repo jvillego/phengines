@@ -10,6 +10,7 @@
 <body>
   <?php EView::getView();?>
   <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js "></script>
   <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
   <?php hlp::dynamicJs();?>
 </body>
