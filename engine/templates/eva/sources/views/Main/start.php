@@ -1,7 +1,7 @@
 <div id="app">
 <template>
   <v-app id="inspire"  >
-    <v-navigation-drawer persistent v-model="drawer" close-on-click="true" enable-resize-watcher app>
+    <v-navigation-drawer clipped persistent v-model="drawer" close-on-click="true" enable-resize-watcher app>
       <v-list dense>
           <v-list-tile>
                 <v-list-tile-content>
@@ -40,7 +40,7 @@
             </v-fade-transition>
       </v-content>
     </main>
-    <v-footer color="indigo" app>
+    <v-footer color="indigo" app fixed>
       <span class="white--text">&copy; 2017</span>
     </v-footer>
   </v-app>

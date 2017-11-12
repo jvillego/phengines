@@ -7,6 +7,8 @@
 
 class EHttp extends EBaseRun{
     
+    private static $http_vars;
+    
     public static function getMethod() {
 //        return filter_input('INPUT_SERVER', 'REQUEST_METHOD'); //TODO: revisar esta forma de capturar la info
         return $_SERVER['REQUEST_METHOD'];
@@ -40,7 +42,7 @@ class EHttp extends EBaseRun{
     
     public static function getVariables(){
 
-        $vars = $_REQUEST;
+        self::$http_vars = $_REQUEST;
         
         //if post or put has body content
         if(in_array(self::getMethod(), array('POST', 'PUT')) ){
@@ -48,14 +50,18 @@ class EHttp extends EBaseRun{
             if(!empty($body_content)){
                 $auxvars = json_decode($body_content, true);
                 if(!is_null($auxvars)){
-                    $vars = array_merge($vars, $auxvars);
+                    self::$http_vars = array_merge($vars, $auxvars);
                 }else{
-                    $vars['data'] = $body_content;
+                    self::$http_vars['data'] = $body_content;
                 }
             }
         }
         
-        return $vars;
+        return self::$http_vars;
+    }
+    
+    public static function htvar($var=null) {
+        return is_null(self::$http_vars[$var])? self::$http_vars : ( isset(self::$http_vars[$var])? self::$http_vars[$var] : self::$http_vars );
     }
 
     /**
